@@ -1,0 +1,76 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\Policy;
+use Illuminate\Http\Request;
+
+class PolicyController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        return response()->json(Policy::with('client')->get());
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'client_id' => 'required|exists:clients,id',
+            'policy_number' => 'required|string|unique:policies',
+            'type' => 'required|in:auto,home,life',
+            'premium' => 'required|numeric|min:0',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after:start_date',
+            'status' => 'sometimes|in:active,expired,cancelled'
+        ]);
+
+        $policy = Policy::create($validated);
+
+        return response()->json($policy->load('client'), 201);
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Policy $policy)
+    {
+        return response()->json($policy->load('client'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Policy $policy)
+    {
+        $validated = $request->validate([
+            'client_id' => 'sometimes|exists:clients,id',
+            'policy_number' => 'sometimes|string|unique:policies,policy_number,' . $policy->id,
+            'type' => 'sometimes|in:auto,home,life',
+            'premium' => 'sometimes|numeric|min:0',
+            'start_date' => 'sometimes|date',
+            'end_date' => 'sometimes|date|after:start_date',
+            'status' => 'sometimes|in:active,expired,cancelled'
+        ]);
+
+        $policy->update($validated);
+
+        return response()->json($policy->load('client'));
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Policy $policy)
+    {
+        $policy->delete();
+
+        return response()->json(null, 204);
+    }
+}
