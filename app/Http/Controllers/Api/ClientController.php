@@ -13,7 +13,7 @@ class ClientController extends Controller
      */
     public function index()
     {
-        return response()->json(Client::all());
+        return response()->json(Client::withCount('policies')->get());
     }
 
     /**
@@ -38,7 +38,7 @@ class ClientController extends Controller
      */
     public function show(Client $client)
     {
-        return response()->json($client);
+        return response()->json($client->loadCount('policies'));
     }
 
     /**
