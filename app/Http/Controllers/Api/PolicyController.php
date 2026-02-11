@@ -11,9 +11,12 @@ class PolicyController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(Policy::with('client')->get());
+        // return response()->json(Policy::with('client')->get());
+        $perPage = $request->get('per_page', 10);
+        $policies = Policy::with('client')->paginate($perPage);
+        return response()->json($policies);
     }
 
     /**
