@@ -22,13 +22,14 @@ class PolicyController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'client_id' => 'required|exists:clients,id',
+            'client_id' => 'sometimes|exists:clients,id',
             'policy_number' => 'required|string|unique:policies',
-            'type' => 'required|in:auto,home,life',
+            'type' => 'required|in:auto,home,life,health',
             'premium' => 'required|numeric|min:0',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
-            'status' => 'sometimes|in:active,expired,cancelled'
+            'coverage_amount' => 'required|numeric|min:0',
+            'start_date' => 'sometimes|date',
+            'end_date' => 'sometimes|date|after:start_date',
+            'status' => 'sometimes|in:active,expired,cancelled,pending'
         ]);
 
         $policy = Policy::create($validated);
@@ -52,11 +53,12 @@ class PolicyController extends Controller
         $validated = $request->validate([
             'client_id' => 'sometimes|exists:clients,id',
             'policy_number' => 'sometimes|string|unique:policies,policy_number,' . $policy->id,
-            'type' => 'sometimes|in:auto,home,life',
-            'premium' => 'sometimes|numeric|min:0',
+            'type' => 'required|in:auto,home,life,health',
+            'premium' => 'required|numeric|min:0',
+            'coverage_amount' => 'required|numeric|min:0',
             'start_date' => 'sometimes|date',
             'end_date' => 'sometimes|date|after:start_date',
-            'status' => 'sometimes|in:active,expired,cancelled'
+            'status' => 'sometimes|in:active,expired,cancelled,pending'
         ]);
 
         $policy->update($validated);
