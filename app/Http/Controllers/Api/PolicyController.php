@@ -14,9 +14,23 @@ class PolicyController extends Controller
     public function index(Request $request)
     {
         // return response()->json(Policy::with('client')->get());
+        $query = Policy::with('client');
+
+        // Filtro per tipo
+        if ($request->has('type') && !empty($request->type)) {
+            $query->where('type', $request->type);
+        }
+
+        // Filtro per stato
+        if ($request->has('status') && !empty($request->status)) {
+            $query->where('status', $request->status);
+        }
+
+        // Ordinamento (opzionale)
+        $query->latest();
+
         $perPage = $request->get('per_page', 10);
-        $policies = Policy::with('client')->paginate($perPage);
-        return response()->json($policies);
+        return response()->json($query->paginate($perPage));
     }
 
     /**
