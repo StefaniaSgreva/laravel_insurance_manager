@@ -15,6 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api(prepend: [
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
         ]);
+        $middleware->validateCsrfTokens(except: [
+            'api/*',  // ← disabilita CSRF per tutte le rotte con prefisso /api
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
